@@ -5,11 +5,79 @@ import { logout } from "@/store/auth/authActions";
 import { useDispatch } from "react-redux";
 import store from "store";
 import { useState } from "react";
+import TaskTable from "./TaskTable";
 
 export default function Home() {
   const authUser = store.get("user");
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [state, setState] = useState({
+    name: "",
+    startDate: "",
+    endDate: "",
+    assignee: "",
+    project: "",
+    description: "",
+    priority: "",
+    attach: "",
+    formErrors: {
+      name: "",
+      startDate: "",
+      endDate: "",
+      assignee: "",
+      project: "",
+      description: "",
+      priority: "",
+      attach: "",
+    },
+  });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    let tempErrors = { ...state.formErrors };
+
+    switch (name) {
+      case "name":
+        tempErrors.name = value.length < 0 ? "Name is required" : "";
+        break;
+
+      case "startDate":
+        tempErrors.startDate = value.length < 0 ? "Start Date is required" : "";
+        break;
+
+      case "endDate":
+        tempErrors.endDate = value.length < 0 ? "End Date is required" : "";
+        break;
+
+      case "assignee":
+        tempErrors.assignee = value.length < 0 ? "Assignee is required" : "";
+        break;
+
+      case "project":
+        tempErrors.project = value.length < 0 ? "Project is required" : "";
+        break;
+
+      case "description":
+        tempErrors.description =
+          value.length < 0 ? "Description is required" : "";
+        break;
+
+      case "priority":
+        tempErrors.priority = value.length < 0 ? "Priority is required" : "";
+        break;
+
+      case "attach":
+        tempErrors.attach = value.length < 0 ? "Attach is required" : "";
+        break;
+
+      default:
+        break;
+    }
+
+    setState({ ...state, [name]: value, formErrors: tempErrors });
+  };
+
+  const handleSubmit = () => {};
 
   const handleLogout = async () => {
     await logout()(dispatch);
@@ -73,13 +141,31 @@ export default function Home() {
           </div>
           <div>
             <h1>Description</h1>
-            <textarea placeholder="Assignee" />
+            <textarea placeholder="Assignee" rows={3} className="p-2 rounded" />
           </div>
           <div>
             <h1>Priority</h1>
-            <Input placeholder="Assignee" type="option" />
+            <div className="flex w-full justify-between">
+              <div className="flex">
+                <input type="radio" name="priority" className="mr-2" />
+                <h1>Low</h1>
+              </div>
+              <div className="flex">
+                <input type="radio" name="priority" className="mr-2" />
+                <h1>Normal</h1>
+              </div>
+              <div className="flex">
+                <input type="radio" name="priority" className="mr-2" />
+                <h1>High</h1>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h1>Attach</h1>
+            <input type="file" />
           </div>
         </Dialog>
+        <TaskTable />
       </div>
     </div>
   );
