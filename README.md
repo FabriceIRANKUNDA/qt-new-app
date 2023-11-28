@@ -1,2 +1,26 @@
-# qt-app
-# qt-new-app
+# Users Management and Tas Management App
+
+## Sacks:
+- React Js
+- Node Js
+- Typescript
+- Tailwind
+
+## Installation
+#### 1. CD to the server directory and run
+```
+$ npm install
+```
+```
+$ npm run dev
+```
+
+
+#### 2. CD to the client directory and run
+```
+$ npm install  
+```
+```
+$ npm run start
+```
+
