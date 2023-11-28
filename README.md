@@ -24,5 +24,3 @@ $ npm install
 $ npm run start
 ```
 
-For both client and server to run without error you will need to set the `Environment variable for each`. Reach out to me for env variables.
-
