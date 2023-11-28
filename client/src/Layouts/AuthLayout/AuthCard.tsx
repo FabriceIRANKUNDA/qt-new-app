@@ -15,7 +15,10 @@ const AuthCard = ({ children, title, isReset }: AuthCardProps) => {
         </h2>
         {children}
         {isReset && (
-          <Link to={"/reset-password"} className=" text-blue-500 underline">
+          <Link
+            to={"/auth/reset-password"}
+            className=" text-blue-500 underline"
+          >
             {" "}
             Forget Password
           </Link>

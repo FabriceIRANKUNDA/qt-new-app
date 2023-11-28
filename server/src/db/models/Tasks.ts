@@ -9,11 +9,12 @@ const taskSchema = new mongoose.Schema<ITask>(
     project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
     dueDate: Date,
     startDate: Date,
-    status: String,
+    status: { type: String, default: 'notdone' },
     priority: String,
     files: [String],
   },
   {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },

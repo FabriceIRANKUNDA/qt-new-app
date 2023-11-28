@@ -3,7 +3,7 @@ export interface Task {
     | "index"
     | "desc"
     | "priority"
-    | "name"
+    | "title"
     | "startDate"
     | "dueDate"
     | "action";
@@ -14,7 +14,7 @@ export interface Task {
 
 export const TaskColumns: Task[] = [
   { id: "index", label: "No", align: "center" },
-  { id: "name", label: "Names", align: "center" },
+  { id: "title", label: "Title", align: "center" },
   { id: "desc", label: "Description", minWidth: 170, align: "center" },
   { id: "startDate", label: "Start Date", minWidth: 170, align: "center" },
   { id: "dueDate", label: "Due Date", minWidth: 170, align: "center" },
@@ -24,7 +24,7 @@ export const TaskColumns: Task[] = [
 
 export interface TaskItem {
   desc?: string;
-  name?: string;
+  title?: string;
   startDate?: string;
   dueDate?: string;
   priority?: string;

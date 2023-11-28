@@ -4,7 +4,6 @@ import AppError from '../utils/helpers/AppError'
 import httpStatus from 'http-status'
 import TokenAuthenticator from '../utils/helpers/tokenAuthenticator'
 import { User } from '../db/models/User'
-import { Employee } from '../db/models/Employee'
 import { Document } from 'mongoose'
 
 export const protectedRoutes = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -23,11 +22,7 @@ export const protectedRoutes = catchAsyncError(async (req: Request, res: Respons
 
   let currentUser: Document<any> | null
 
-  if (payload.role === 'owner') {
-    currentUser = await User.findById(payload.id)
-  } else {
-    currentUser = await Employee.findById(payload.id)
-  }
+  currentUser = await User.findById(payload.id)
 
   if (!currentUser)
     return next(new AppError(httpStatus.UNAUTHORIZED, 'Token belongs to the user who is no longer exist!.'))

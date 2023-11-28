@@ -137,10 +137,15 @@ export class AuthController {
     newUser.password = hashPassword(req.body.password)
 
     await newUser.save({ validateBeforeSave: false })
+    const token = TokenAuthenticator.signToken(newUser.toObject())
 
     return res.status(httpStatus.OK).json({
       status: 'success',
       message: 'Password reset successful',
+      data: {
+        token,
+        user: newUser,
+      },
     })
   })
 
@@ -151,10 +156,10 @@ export class AuthController {
     })
 
     if (!user) return next(new AppError(httpStatus.NOT_FOUND, 'No User found with that ID'))
-
+    const token = TokenAuthenticator.signToken(user.toObject())
     return res.status(httpStatus.OK).json({
       status: 'success',
-      data: user,
+      data: { user, token },
     })
   })
 }

@@ -1,13 +1,15 @@
 import { validateForm } from "@/utils/validateForm";
-import React, { useState, Fragment } from "react";
+import { useState, Fragment } from "react";
 import { Input, inputInvalid } from "../ui/input";
 import Loader from "../Loader";
 import { Button } from "../ui/button";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUserAction } from "@/store/auth/authActions";
-
-export default function SetNewPassWord() {
+import { updatePasswordAction } from "@/store/auth/authActions";
+type Props = {
+  otp: string;
+};
+export default function SetNewPassWord({ otp }: Props) {
   const authState = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const [state, setState] = useState({
@@ -29,9 +31,7 @@ export default function SetNewPassWord() {
         break;
       case "confirmPassword":
         tempErrors.confirmPassword =
-          value.length < 8 && value !== state.password
-            ? "Invalid password"
-            : "";
+          value !== state.password ? "Invalid password" : "";
         break;
       default:
         break;
@@ -43,8 +43,8 @@ export default function SetNewPassWord() {
   const handleSubmit = () => {
     const data = {
       password: state.password,
-
       confirmPassword: state.confirmPassword,
+      otp,
     };
 
     let tempErrors = {
@@ -55,27 +55,25 @@ export default function SetNewPassWord() {
     setState({ ...state, formErrors: tempErrors });
 
     if (validateForm(state, tempErrors)) {
-      updateUserAction({ ...data })(dispatch);
+      updatePasswordAction({ ...data })(dispatch);
     }
   };
 
   return (
     <Fragment>
       <div className="flex flex-col self-stretch w-full gap-3">
-        <p className=" text-center ">
-          Enter your phone number to reset password
-        </p>
+        <p className=" text-center ">Enter new password</p>
         <div className="flex flex-col justify-evenly h-40">
           <Input
             placeholder="new password"
-            type="text"
+            type="password"
             name="password"
             className={`${state.formErrors.password ? inputInvalid : ""}`}
             onChange={handleChange}
           />
           <Input
             placeholder="confirm new password"
-            type="text"
+            type="password"
             name="confirmPassword"
             className={`${
               state.formErrors.confirmPassword ? inputInvalid : ""

@@ -5,9 +5,12 @@ import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/Signup";
 import store from "store";
 import ResetPassword from "@/pages/Auth/ResetPassword";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export const MainRoutes = () => {
   const authUser = store.get("user");
+  const authState = useSelector((state: RootState) => state.auth);
 
   return (
     <Routes>
@@ -15,7 +18,10 @@ export const MainRoutes = () => {
         path="/auth/login"
         element={authUser ? <Navigate to="/" /> : <Login />}
       />
-      <Route path="/auth/reset-password" element={<ResetPassword />} />
+      <Route
+        path="/auth/reset-password"
+        element={authUser ? <Navigate to="/" /> : <ResetPassword />}
+      />
       <Route
         path="/auth/sign-up"
         element={authUser ? <Navigate to="/" /> : <Signup />}

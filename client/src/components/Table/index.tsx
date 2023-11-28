@@ -6,7 +6,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { Paper } from "@mui/material";
 import TablePagination from "@mui/material/TablePagination";
-import NoData from "../NoData";
 
 export default function TableComponent(props: any) {
   const {
@@ -46,7 +45,7 @@ export default function TableComponent(props: any) {
                       }}
                     >
                       {props.hideColumn && column.label === "No"
-                        ? "Man Power"
+                        ? ""
                         : column.label}
                     </TableCell>
                   ))}
@@ -55,9 +54,7 @@ export default function TableComponent(props: any) {
               <TableBody>
                 {rows.map((row: any, index: number) => (
                   <TableRow
-                    hover
                     style={{
-                      cursor: "pointer",
                       height: "44px",
                       background: `${index % 2 == 0 ? "#f5faff" : "white"}`,
                     }}
@@ -85,11 +82,6 @@ export default function TableComponent(props: any) {
                             fontSize: "0.85rem",
                           }}
                           align={column.align}
-                          onClick={() =>
-                            column.id === "action"
-                              ? null
-                              : rowClickedHandler(row.id, row.projectId, row)
-                          }
                         >
                           {value}
                         </TableCell>
@@ -102,16 +94,14 @@ export default function TableComponent(props: any) {
           </TableContainer>
           <TablePagination
             component="div"
-            count={1}
-            page={1}
+            count={count}
+            page={page}
             onPageChange={handlePageChange}
-            rowsPerPage={1}
+            rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleRowsPerPageChange}
           />
         </>
       )}
-
-      {!props.isPreview && rows.length === 0 && <NoData />}
     </>
   );
 }

@@ -15,7 +15,7 @@ const ResetPassword = () => {
   const dispatch = useDispatch();
   const authState = useSelector((state: RootState) => state.auth);
   const [otp, setOtp] = useState("");
-
+  console.log("::::::::::::::::::::", authState);
   const [state, setState] = useState({
     phone: "",
     formErrors: {
@@ -38,7 +38,7 @@ const ResetPassword = () => {
     setState({ ...state, [name]: value, formErrors: tempErrors });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const data = {
       phone: state.phone,
     };
@@ -51,7 +51,7 @@ const ResetPassword = () => {
     setState({ ...state, formErrors: tempErrors });
 
     if (validateForm(state, tempErrors)) {
-      resetPasswordAction({ ...data })(dispatch);
+      await resetPasswordAction({ ...data })(dispatch);
     }
   };
 
@@ -65,63 +65,64 @@ const ResetPassword = () => {
   return (
     <AuthLayout title="Forget Password">
       <Fragment>
-        {!authState.reset ? (
-          <>
-            <div className="flex flex-col self-stretch w-full gap-3">
-              <p className=" text-center ">
-                Enter your phone number to reset password
-              </p>
-              <div className="flex flex-col justify-evenly h-40">
-                <Input
-                  placeholder="phone (078..."
-                  type="text"
-                  name="phone"
-                  className={`${state.formErrors.phone ? inputInvalid : ""}`}
-                  onChange={handleChange}
-                />
+        {!authState.otpVerified &&
+          (!authState.reset ? (
+            <>
+              <div className="flex flex-col self-stretch w-full gap-3">
+                <p className=" text-center ">
+                  Enter your phone number to reset password
+                </p>
+                <div className="flex flex-col justify-evenly h-40">
+                  <Input
+                    placeholder="phone (078..."
+                    type="text"
+                    name="phone"
+                    className={`${state.formErrors.phone ? inputInvalid : ""}`}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
-            </div>
-            <Button
-              variant="basic"
-              size="lg"
-              className="relative hover:scale-105 transition-all w-full"
-              onClick={handleSubmit}
-            >
-              Submit
-              {authState.loading && <Loader />}
-            </Button>
-          </>
-        ) : (
-          <>
-            <p className=" text-center ">Enter your code</p>
-            <OtpField
-              value={otp}
-              onChange={(e: any) => {
-                setOtp(e);
-              }}
-              numInputs={4}
-              onChangeRegex={/^([0-9]{0,})$/}
-              autoFocus
-              separator={<span className="m-2"> </span>}
-              autoComplete={"on"}
-              classNames="flex w-full justify-center"
-              inputProps={{
-                className: "w-14 p-4 border border-[#1987ff]",
-                disabled: false,
-              }}
-            />
-            <Button
-              variant="basic"
-              size="lg"
-              className="relative hover:scale-105 transition-all w-full"
-              onClick={handleSubmitOtp}
-            >
-              Submit
-              {authState.loading && <Loader />}
-            </Button>
-          </>
-        )}
-        {authState.otpVerified && <SetNewPassWord />}
+              <Button
+                variant="basic"
+                size="lg"
+                className="relative hover:scale-105 transition-all w-full"
+                onClick={handleSubmit}
+              >
+                Submit
+                {authState.loading && <Loader />}
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className=" text-center ">Enter your code</p>
+              <OtpField
+                value={otp}
+                onChange={(e: any) => {
+                  setOtp(e);
+                }}
+                numInputs={4}
+                onChangeRegex={/^([0-9]{0,})$/}
+                autoFocus
+                separator={<span className="m-2"> </span>}
+                autoComplete={"on"}
+                classNames="flex w-full justify-center"
+                inputProps={{
+                  className: "w-14 p-4 border border-[#1987ff]",
+                  disabled: false,
+                }}
+              />
+              <Button
+                variant="basic"
+                size="lg"
+                className="relative hover:scale-105 transition-all w-full"
+                onClick={handleSubmitOtp}
+              >
+                Submit
+                {authState.loading && <Loader />}
+              </Button>
+            </>
+          ))}
+        {authState.otpVerified && <SetNewPassWord otp={otp} />}
       </Fragment>
     </AuthLayout>
   );

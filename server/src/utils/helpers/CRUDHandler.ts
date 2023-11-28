@@ -4,6 +4,7 @@ import catchAsyncError from './catchAsyncError'
 import { NextFunction, Request, Response } from 'express'
 import AppError from './AppError'
 import httpStatus from 'http-status'
+const APIfeatures = require('./APIfeatures')
 
 export class CRUDHandler {
   static createOne = (Model: Model<OurModels>) =>
@@ -62,15 +63,18 @@ export class CRUDHandler {
 
   static getMany = (Model: Model<OurModels>) =>
     catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-      const doc = await Model.find()
+      const features = new APIfeatures(Model.find(), req.query).filter().sort().limitFields().paginate()
+      const count = await Model.find().countDocuments()
+      const docs = await features.query
 
-      if (!doc) {
+      if (!docs) {
         return next(new AppError(httpStatus.NOT_FOUND, 'No document found'))
       }
 
       return res.status(httpStatus.OK).json({
         status: 'success',
-        data: doc,
+        data: docs,
+        count,
       })
     })
 }

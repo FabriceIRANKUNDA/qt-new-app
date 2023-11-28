@@ -53,9 +53,7 @@ export default function SignUp() {
         break;
       case "confirmPassword":
         tempErrors.confirmPassword =
-          value.length < 8 && value !== state.password
-            ? "Invalid password"
-            : "";
+          value !== state.password ? "Invalid password" : "";
         break;
       default:
         break;

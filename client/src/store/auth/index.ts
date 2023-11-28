@@ -68,6 +68,7 @@ const authslice = createSlice({
       state,
       action: PayloadAction<{ reset: boolean; otpVerified: boolean }>
     ) => {
+      console.log("**************", action.payload.reset);
       state.reset = action.payload.reset;
       state.otpVerified = action.payload.otpVerified;
     },
@@ -79,6 +80,13 @@ const authslice = createSlice({
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
+    },
+    setUpdateUser: (
+      state,
+      action: PayloadAction<{ token: string; user: User }>
+    ) => {
+      store.set("x-auth-token", action.payload.token);
+      store.set("user", action.payload.user);
     },
   },
 });

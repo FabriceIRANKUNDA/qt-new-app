@@ -21,6 +21,7 @@ type MagickDialogProps = {
   submitText?: string;
   hideButton?: boolean;
   onSubmit?: () => void;
+  onCancel?: () => void;
   destructive?: boolean;
   submitDisabled?: boolean;
   isLoading?: boolean;
@@ -37,6 +38,7 @@ const MagickDialog: FunctionComponent<MagickDialogProps> = ({
   hideButton = false,
   submitText = "Save changes",
   onSubmit = () => {},
+  onCancel = () => {},
   destructive = false,
   submitDisabled = false,
   isLoading = false,
@@ -47,6 +49,7 @@ const MagickDialog: FunctionComponent<MagickDialogProps> = ({
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           setOpen(false);
+          onCancel();
         }
       }}
       open={open}
@@ -66,11 +69,18 @@ const MagickDialog: FunctionComponent<MagickDialogProps> = ({
             {description}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">{children}</div>
+        <div className="grid gap-4">{children}</div>
         <DialogFooter className="mx-auto">
+          <Button
+            onClick={onCancel}
+            size="sm"
+            className="dark:bg-[#262b2e] border border-[#262b2e] dark:text-current bg-transparent text-black mr-4 hover:scale-105 transition-all"
+          >
+            <span className="text-base">Cancel</span>
+          </Button>
           {submitButton && (
             <Button
-              className=" text-[#fff] font-bold min-w-[200px]"
+              className=" text-[#fff] font-bold min-w-[200px] hover:scale-105 transition-all"
               onClick={onSubmit}
               disabled={submitDisabled}
             >

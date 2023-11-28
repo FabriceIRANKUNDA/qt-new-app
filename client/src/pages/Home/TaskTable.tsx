@@ -1,16 +1,54 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { TaskItem, TaskColumns } from "@/interfaces";
 import { useState } from "react";
 import TableComponent from "@/components/Table";
 import Dialog from "@/components/Dialog";
 import { Input } from "@/components/ui/input";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getTasksAction,
+  deleteTaskAction,
+  getTaskStatsAction,
+} from "@/store/task/taskActions";
+import { taskActions } from "@/store/task";
+import { RootState } from "@/store";
+import store, { set } from "store";
+import Moment from "moment";
+import { Menu, MenuItem, Typography } from "@mui/material";
+import ConfirmModal from "@/components/ConfirmModal";
+import CreateTask from "./CreateTask";
 
 export default function TaskTable() {
-  const [openTaskDrawer, setOpenTaskDrawer] = useState(false);
   const [task, setTask] = useState<any>(undefined);
+  const token = store.get("x-auth-token");
+  const dispatch = useDispatch();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const { tasks, count, updateNeeded } = useSelector(
+    (state: RootState) => state.task
+  );
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    if (updateNeeded) {
+      getTasksAction(
+        `?&page=${page}&sort=-updatedAt&limit=${rowsPerPage}`,
+        token
+      )(dispatch);
+      getTaskStatsAction(token)(dispatch);
+    }
+  }, [page, rowsPerPage, token, updateNeeded, dispatch]);
 
   const createData = (
-    name: string,
+    title: string,
     desc: string,
     priority: string,
     startDate: string,
@@ -19,7 +57,7 @@ export default function TaskTable() {
     el: any
   ): TaskItem => {
     return {
-      name,
+      title,
       desc,
       priority,
       startDate,
@@ -29,142 +67,110 @@ export default function TaskTable() {
       action: (
         <>
           <button
-            onClick={() => {
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
               let taskInfo = { ...el };
               delete taskInfo["_id"];
-              let obj = { taskInfo };
+              let obj = { ...taskInfo };
               setTask(obj);
-              setOpenTaskDrawer(true);
+              setAnchorEl(event.currentTarget);
             }}
+            className=""
           >
-            <span className={""}>View Details</span>
+            •••
           </button>
         </>
       ),
     };
   };
 
-  const data = [
-    {
-      name: "test",
-      startDate: Date.now(),
-      dueDate: Date.now(),
-      priority: "high",
-      assignee: "test",
-      desc: "test",
-    },
-    {
-      name: "test",
-      startDate: Date.now(),
-      dueDate: Date.now(),
-      priority: "high",
-      assignee: "test",
-      desc: "test",
-    },
-    {
-      name: "test",
-      startDate: Date.now(),
-      dueDate: Date.now(),
-      priority: "high",
-      assignee: "test",
-      desc: "test",
-    },
-    {
-      name: "test",
-      startDate: Date.now(),
-      dueDate: Date.now(),
-      priority: "high",
-      assignee: "test",
-      desc: "test",
-    },
-    {
-      name: "test",
-      startDate: Date.now(),
-      dueDate: Date.now(),
-      priority: "high",
-      assignee: "test",
-      desc: "test",
-    },
-    {
-      name: "test",
-      startDate: Date.now(),
-      dueDate: Date.now(),
-      priority: "high",
-      assignee: "test",
-      desc: "test",
-    },
-  ];
-
-  const rows = data?.map((item: any) =>
+  const rows = tasks?.map((item: any) =>
     createData(
-      item.name,
-      item.desc,
+      item.title,
+      item.description,
       item.priority,
-      item.startDate,
-      item.dueDate,
+      Moment(item.startDate).format("d MMM YYYY"),
+      Moment(item.dueDate).format("d MMM YYYY"),
       item.assignee,
       item
     )
   );
 
+  const handlePageChange = (event: unknown, newPage: number) => {
+    dispatch(taskActions.setUpdateNeeded(true));
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    dispatch(taskActions.setUpdateNeeded(true));
+    setRowsPerPage(parseInt(event.target.value));
+    setPage(0);
+  };
+
+  const handleDeleteTask = async () => {
+    await deleteTaskAction(task.id, token)(dispatch);
+    setOpenConfirmModal(false);
+  };
+
   return (
-    <div>
-      <TableComponent rows={rows} columns={TaskColumns} />
-      {task && (
-        <Dialog
-          open={openTaskDrawer}
-          setOpen={setOpenTaskDrawer}
-          submitText="Submit"
-          title="Create Task"
+    <div className="py-4">
+      <TableComponent
+        rows={rows}
+        columns={TaskColumns}
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        handlePageChange={handlePageChange}
+        handleRowsPerPageChange={handleRowsPerPageChange}
+      />
+      {open && (
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
         >
-          <div className="flex flex-col">
-            <h1>Name</h1>
-            <Input placeholder="Name" />
-          </div>
-          <div className="flex justify-between">
-            <div>
-              <h1>Start Date</h1>
-              <Input type="Date" />
-            </div>
-            <div>
-              <h1>End Date</h1>
-              <Input type="Date" />
-            </div>
-          </div>
-          <div>
-            <h1>Assignee</h1>
-            <Input placeholder="Assignee" type="select" />
-          </div>
-          <div>
-            <h1>Project</h1>
-            <Input placeholder="Assignee" type="select" />
-          </div>
-          <div>
-            <h1>Description</h1>
-            <textarea placeholder="Assignee" rows={3} className="p-2 rounded" />
-          </div>
-          <div>
-            <h1>Priority</h1>
-            <div className="flex w-full justify-between">
-              <div className="flex">
-                <input type="radio" name="priority" className="mr-2" />
-                <h1>Low</h1>
-              </div>
-              <div className="flex">
-                <input type="radio" name="priority" className="mr-2" />
-                <h1>Normal</h1>
-              </div>
-              <div className="flex">
-                <input type="radio" name="priority" className="mr-2" />
-                <h1>High</h1>
-              </div>
-            </div>
-          </div>
-          <div>
-            <h1>Attach</h1>
-            <input type="file" />
-          </div>
-        </Dialog>
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setOpenUpdateModal(true);
+            }}
+          >
+            <Typography>Update</Typography>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setOpenConfirmModal(true);
+            }}
+          >
+            <Typography>Delete</Typography>
+          </MenuItem>
+        </Menu>
+      )}
+      {openUpdateModal && (
+        <CreateTask
+          open={openUpdateModal}
+          setOpen={setOpenUpdateModal}
+          task={task}
+          action="update"
+        />
+      )}
+      {openConfirmModal && (
+        <ConfirmModal
+          onConfirm={() => {
+            handleDeleteTask();
+          }}
+          open={openConfirmModal}
+          onClose={() => {
+            setOpenConfirmModal(false);
+          }}
+          content={`Please confirm to delete this Task with title: ${task.title}`}
+        />
       )}
     </div>
   );

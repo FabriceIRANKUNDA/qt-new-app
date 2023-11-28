@@ -3,7 +3,6 @@ import { authActions } from ".";
 import API from "@/utils/API";
 import store from "store";
 import { messageActions } from "../message";
-import { tr } from "date-fns/locale";
 
 export const loginAction = (data: { password: string; email: string }) => {
   return async (dispatch: Dispatch) => {
@@ -33,11 +32,50 @@ export const resetPasswordAction = (data: { phone: string }) => {
       dispatch(authActions.setLoading(true));
       const res = await API.auth("/auth/forget-password", data);
       if (res.data.status === "success") {
-        authActions.resetPassword({ reset: true, otpVerified: false });
-        messageActions.setMessage({ message: res.data.message, type: "info" });
+        dispatch(
+          authActions.resetPassword({ reset: true, otpVerified: false })
+        );
+        dispatch(
+          messageActions.setMessage({ message: res.data.message, type: "info" })
+        );
       } else {
         dispatch(
-          messageActions.setMessage({ message: res.message, type: "error" })
+          messageActions.setMessage({
+            message: res.data.message,
+            type: "error",
+          })
+        );
+      }
+    } catch (err: any) {
+      dispatch(
+        messageActions.setMessage({ message: err.message, type: "error" })
+      );
+    } finally {
+      dispatch(authActions.setLoading(false));
+    }
+  };
+};
+export const updatePasswordAction = (data: any) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      dispatch(authActions.setLoading(true));
+      const res = await API.post("/auth/reset-password", data);
+      if (res.data.status === "success") {
+        dispatch(
+          authActions.login({
+            token: res.data.data.token,
+            user: res.data.data.user,
+          })
+        );
+        dispatch(
+          messageActions.setMessage({ message: res.data.message, type: "info" })
+        );
+      } else {
+        dispatch(
+          messageActions.setMessage({
+            message: res.data.message,
+            type: "error",
+          })
         );
       }
     } catch (err: any) {
@@ -56,8 +94,12 @@ export const verfiyOTPAction = (data: { otp: string }) => {
       dispatch(authActions.setLoading(true));
       const res = await API.auth("/auth/verify-otp", data);
       if (res.data.status === "success") {
-        authActions.resetPassword({ otpVerified: true, reset: false });
-        messageActions.setMessage({ message: res.data.message, type: "info" });
+        dispatch(
+          authActions.resetPassword({ otpVerified: true, reset: false })
+        );
+        dispatch(
+          messageActions.setMessage({ message: res.data.message, type: "info" })
+        );
       } else {
         dispatch(
           messageActions.setMessage({ message: res.message, type: "error" })
@@ -86,7 +128,9 @@ export const signUpAction = (data: {
       const res = await API.auth("/auth/signup", data);
       if (res.data.status === "success") {
         dispatch(authActions.signup(res.data));
-        messageActions.setMessage({ message: res.data.message, type: "info" });
+        dispatch(
+          messageActions.setMessage({ message: res.data.message, type: "info" })
+        );
       } else {
         dispatch(
           messageActions.setMessage({ message: res.message, type: "error" })
@@ -100,14 +144,21 @@ export const signUpAction = (data: {
   };
 };
 
-export const updateUserAction = (data: object) => {
+export const updateUserAction = (data: any) => {
   return async (dispatch: Dispatch) => {
     try {
       dispatch(authActions.setLoading(true));
-      const res = await API.auth("/auth/me", data);
-      if (res.data.status === "success") {
-        dispatch(authActions.login(res.data));
-        messageActions.setMessage({ message: res.data.message, type: "info" });
+      const res = await API.update(
+        `/auth/profile/${data.id}`,
+        data,
+        data.token
+      );
+      if (res.data?.status === "success") {
+        console.log(res.data);
+        dispatch(authActions.setUpdateUser(res.data.data));
+        dispatch(
+          messageActions.setMessage({ message: res.data.message, type: "info" })
+        );
       } else {
         dispatch(
           messageActions.setMessage({ message: res.message, type: "error" })
