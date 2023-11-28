@@ -7,7 +7,7 @@
 - Tailwind
 
 ## Installation
-#### 1. CD to the server directory and inside it run
+#### 1. CD to the server directory and run
 ```
 $ npm install
 ```
@@ -16,7 +16,7 @@ $ npm run dev
 ```
 
 
-#### 2. CD to the client directory and inside it run
+#### 2. CD to the client directory and run
 ```
 $ npm install  
 ```
