@@ -62,12 +62,6 @@ export const updatePasswordAction = (data: any) => {
       const res = await API.post("/auth/reset-password", data);
       if (res.data.status === "success") {
         dispatch(
-          authActions.login({
-            token: res.data.data.token,
-            user: res.data.data.user,
-          })
-        );
-        dispatch(
           messageActions.setMessage({ message: res.data.message, type: "info" })
         );
       } else {

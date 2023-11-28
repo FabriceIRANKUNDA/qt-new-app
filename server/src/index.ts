@@ -5,9 +5,6 @@ import HttpStatus from 'http-status'
 import { connectDB } from './db/connnect'
 import ErrorHandler from './middleware/error.middleware'
 import router from './routers'
-import passport from 'passport'
-import { deserializeUser } from './utils/helpers/deserializeUser'
-import { serializeUser } from './utils/helpers/serializeUser'
 
 const app = express()
 const port = config.appPort
@@ -20,10 +17,6 @@ app.use(express.urlencoded({ limit: '50mb', extended: false }))
 app.use(express.text({ limit: '50mb' }))
 app.use(cors({ origin: config.cors.allowedOrigin, allowedHeaders: config.cors.allowedHeaders, credentials: true }))
 app.use(express.json({ limit: '50mb', type: 'application/json' }))
-
-passport.serializeUser(serializeUser)
-
-passport.deserializeUser(deserializeUser)
 
 app.use('/api/v1', router)
 

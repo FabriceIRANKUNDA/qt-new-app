@@ -9,9 +9,10 @@ const APIfeatures = require('./APIfeatures')
 export class CRUDHandler {
   static createOne = (Model: Model<OurModels>) =>
     catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-      const doc = await Model.create(req.body)
+      const doc = await Model.create({ ...req.body, userId: req.authorUser.id })
       return res.status(201).json({
         status: 'success',
+        message: 'Created successfully',
         data: doc,
       })
     })
@@ -29,6 +30,7 @@ export class CRUDHandler {
 
       return res.status(httpStatus.OK).json({
         status: 'success',
+        message: 'Updated successfully',
         data: doc,
       })
     })
@@ -43,6 +45,7 @@ export class CRUDHandler {
 
       return res.status(httpStatus.NO_CONTENT).json({
         status: 'success',
+        message: 'Deleted successfully',
         data: null,
       })
     })
@@ -63,8 +66,12 @@ export class CRUDHandler {
 
   static getMany = (Model: Model<OurModels>) =>
     catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-      const features = new APIfeatures(Model.find(), req.query).filter().sort().limitFields().paginate()
-      const count = await Model.find().countDocuments()
+      const features = new APIfeatures(Model.find({ userId: req.authorUser.id }), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate()
+      const count = await Model.find({ userId: req.authorUser.id }).countDocuments()
       const docs = await features.query
 
       if (!docs) {

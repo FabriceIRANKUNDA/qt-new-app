@@ -7,6 +7,7 @@ const taskSchema = new mongoose.Schema<ITask>(
     description: String,
     assignee: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     dueDate: Date,
     startDate: Date,
     status: { type: String, default: 'notdone' },

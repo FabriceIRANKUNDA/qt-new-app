@@ -147,9 +147,7 @@ export default function CreateTask({
         .then((response) => {
           data.push(response.data["secure_url"]);
         })
-        .catch((err) => {
-          console.log(">>>>>>>>>>>>>>{{{{{", err.message);
-        });
+        .catch((err) => {});
     }
     return data;
   };
@@ -181,8 +179,13 @@ export default function CreateTask({
     setState({ ...state, formErrors: tempErrors });
     if (validateForm(state, tempErrors)) {
       dispatch(taskActions.setLoading(true));
+      // Upload documents to cloudinary OR user URL.createObjectURL(file)
       const files = await uploadDocuments();
-      createTaskAction({ ...data, attach: files }, token)(dispatch);
+
+      createTaskAction(
+        { ...data, attach: files.length > 0 ? files : data.attach },
+        token
+      )(dispatch);
     }
   };
 

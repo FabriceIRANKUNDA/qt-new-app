@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 
 export default function Toast() {
   const messageState = useSelector((state: RootState) => state.message);
-  console.log(".....................", messageState);
   if (messageState.type === "info") {
     toast.success(messageState.message);
   } else if (messageState.type === "error") {

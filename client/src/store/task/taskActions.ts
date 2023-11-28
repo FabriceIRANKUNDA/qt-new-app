@@ -2,13 +2,13 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { taskActions } from ".";
 import API from "@/utils/API";
 import { messageActions } from "../message";
+import toast from "react-hot-toast";
 
 export const getTasksAction = (query: string, token: string) => {
   return async (dispatch: Dispatch) => {
     try {
       dispatch(taskActions.setLoading(true));
       const res = await API.get(`/task/${query}`, token);
-
       if (res.data.status === "success") {
         dispatch(
           taskActions.setTasks({ data: res.data.data, count: res.data.count })
@@ -85,7 +85,10 @@ export const deleteTaskAction = (id: string, token: string) => {
       if (res.status === 204) {
         dispatch(taskActions.setUpdateNeeded(true));
         dispatch(
-          messageActions.setMessage({ message: res.data.message, type: "info" })
+          messageActions.setMessage({
+            message: "Task deleted successfully",
+            type: "info",
+          })
         );
       } else {
         dispatch(

@@ -21,6 +21,7 @@ export interface ITask {
   priority: string
   files: string[]
   project: any
+  userId: any
 }
 
 export interface IProject {

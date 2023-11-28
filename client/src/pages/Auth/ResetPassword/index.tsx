@@ -10,12 +10,12 @@ import { Fragment, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import OtpField from "react-otp-field";
 import SetNewPassWord from "@/components/SetNewPassWord";
+import { Link } from "react-router-dom";
 
 const ResetPassword = () => {
   const dispatch = useDispatch();
   const authState = useSelector((state: RootState) => state.auth);
   const [otp, setOtp] = useState("");
-  console.log("::::::::::::::::::::", authState);
   const [state, setState] = useState({
     phone: "",
     formErrors: {
@@ -107,10 +107,19 @@ const ResetPassword = () => {
                 autoComplete={"on"}
                 classNames="flex w-full justify-center"
                 inputProps={{
-                  className: "w-14 p-4 border border-[#1987ff]",
+                  className: "w-14 p-4 border border-[#1987ff] mb-4",
                   disabled: false,
                 }}
               />
+
+              <Link
+                to={"/auth/reset-password"}
+                className=" text-blue-500 underline"
+              >
+                {" "}
+                Resend Code
+              </Link>
+
               <Button
                 variant="basic"
                 size="lg"

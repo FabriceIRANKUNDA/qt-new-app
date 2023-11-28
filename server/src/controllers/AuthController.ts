@@ -7,7 +7,6 @@ import { User } from '../db/models/User'
 import TokenAuthenticator from '../utils/helpers/tokenAuthenticator'
 import { comparePassword } from '../utils/helpers/ComparePassword'
 import SendSMS from '../utils/helpers/SendSMS'
-import { CRUDHandler } from '../utils/helpers/CRUDHandler'
 
 export class AuthController {
   static createAccount = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -48,38 +47,6 @@ export class AuthController {
       user,
     })
   })
-
-  static loginFailed = (req: Request, res: Response, next: NextFunction) => {
-    res.status(httpStatus.UNAUTHORIZED).json({
-      status: 'failed',
-      message: 'Login failed',
-    })
-  }
-
-  static loginSuccess = (req: Request, res: Response, next: NextFunction) => {
-    if (req.user) {
-      return res.status(httpStatus.OK).json({
-        message: 'Successfully logged in',
-        status: 'success',
-        user: req.user,
-        token: TokenAuthenticator.signToken(req.user),
-      })
-    }
-
-    return res.status(httpStatus.UNAUTHORIZED).json({ status: 'failed', message: 'Not authorized' })
-  }
-
-  static logout = (req: Request, res: Response, next: NextFunction) => {
-    req.logout(function (err) {
-      if (err) {
-        return next(err)
-      }
-      return res.status(httpStatus.OK).json({
-        status: 'success',
-        message: 'Successfully logged out',
-      })
-    })
-  }
 
   static createPasswordResetToken = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { phone } = req.body
@@ -141,7 +108,7 @@ export class AuthController {
 
     return res.status(httpStatus.OK).json({
       status: 'success',
-      message: 'Password reset successful',
+      message: 'Password reset successfully',
       data: {
         token,
         user: newUser,

@@ -4,9 +4,7 @@ import { NextFunction, Request, Response } from 'express'
 import { User } from '../db/models/User'
 import catchAsyncError from '../utils/helpers/catchAsyncError'
 import exceljs from 'exceljs'
-import pump from 'pump'
-import { Stream } from 'stream'
-
+import { Types } from 'mongoose'
 export class TaskController {
   static createTask = CRUDHandler.createOne(Task)
   static updateTask = CRUDHandler.updateOne(Task)
@@ -32,9 +30,8 @@ export class TaskController {
   static exportData = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const workbook = new exceljs.Workbook()
     const worksheet = workbook.addWorksheet('Sheet 1')
-    console.log('exporting data')
-    const data = await Task.find({}).exec()
 
+    const data = await Task.find({ userId: req.authorUser.id }).exec()
     const columns = [
       { header: 'title', key: 'title', width: 20 },
       { header: 'description', key: 'description', width: 10 },
@@ -42,6 +39,7 @@ export class TaskController {
       { header: 'startDate', key: 'startDate', width: 30 },
       { header: 'priority', key: 'priority', width: 30 },
       { header: 'project', key: 'project', width: 30 },
+      { header: 'assignee', key: 'assignee', width: 30 },
     ]
 
     worksheet.columns = columns
@@ -72,6 +70,9 @@ export class TaskController {
   static getTaskStats = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const data = await Task.aggregate([
       {
+        $match: { userId: new Types.ObjectId(req.authorUser.id) },
+      },
+      {
         $group: {
           _id: null,
           notDone: { $sum: { $cond: [{ $eq: ['$status', 'notdone'] }, 1, 0] } },
@@ -82,6 +83,7 @@ export class TaskController {
         },
       },
     ])
+
     return res.status(200).json({
       status: 'success',
       data,

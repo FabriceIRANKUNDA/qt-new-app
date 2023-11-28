@@ -6,12 +6,14 @@ import { Button } from "../ui/button";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePasswordAction } from "@/store/auth/authActions";
+import { useNavigate } from "react-router";
 type Props = {
   otp: string;
 };
 export default function SetNewPassWord({ otp }: Props) {
   const authState = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [state, setState] = useState({
     password: "",
     confirmPassword: "",
@@ -40,7 +42,7 @@ export default function SetNewPassWord({ otp }: Props) {
     setState({ ...state, [name]: value, formErrors: tempErrors });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const data = {
       password: state.password,
       confirmPassword: state.confirmPassword,
@@ -55,7 +57,8 @@ export default function SetNewPassWord({ otp }: Props) {
     setState({ ...state, formErrors: tempErrors });
 
     if (validateForm(state, tempErrors)) {
-      updatePasswordAction({ ...data })(dispatch);
+      await updatePasswordAction({ ...data })(dispatch);
+      navigate("/auth/login");
     }
   };
 

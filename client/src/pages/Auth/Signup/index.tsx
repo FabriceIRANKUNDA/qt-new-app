@@ -106,9 +106,9 @@ export default function SignUp() {
               onChange={handleChange}
             />
             <Input
-              placeholder="phone"
+              placeholder="phone (078..."
               type="text"
-              name="phone (078..."
+              name="phone"
               className={`${state.formErrors.phone ? inputInvalid : ""}`}
               onChange={handleChange}
             />
