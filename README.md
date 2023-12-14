@@ -1,4 +1,4 @@
-# Users Management and Task Management App
+# User Management and Task Management App
 
 ## Sacks:
 - React Js
@@ -7,6 +7,7 @@
 - Tailwind
 
 ## Installation
+Create .env.local in the server root folder and add, ```DATABASE_URL```, ```DATABASE_PASSWORD``` from your MongoDB cluster.
 #### 1. CD to the server directory and run
 ```
 $ npm install
