@@ -31,7 +31,10 @@ export const getTasksAction = (query: string, token: string) => {
 export const createTaskAction = (data: object, token: string) => {
   return async (dispatch: Dispatch) => {
     try {
-      const res = await API.post("/task", data, token);
+      console.log("??????????????????????????", data);
+      const res = await API.post("/task", data, token, {
+        "content-type": "multipart/form-data",
+      });
       if (res.data.status === "success") {
         dispatch(taskActions.setUpdateNeeded(true));
         dispatch(

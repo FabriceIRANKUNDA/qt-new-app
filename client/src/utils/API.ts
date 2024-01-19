@@ -53,13 +53,14 @@ class API {
     }
   }
 
-  static async post(url: string, data: any, token?: string) {
+  static async post(url: string, data: any, token?: string, headers = {}) {
     try {
       const res = await axios({
         method: "POST",
         url: this.baseUrl + url,
         headers: {
           Authorization: `Bearer ${token}`,
+          ...headers,
         },
         data,
       });

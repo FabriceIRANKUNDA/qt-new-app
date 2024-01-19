@@ -1,7 +1,6 @@
 import Dialog from "@/components/Dialog";
 import { Input, inputInvalid } from "@/components/ui/input";
 import { validateForm } from "@/utils/validateForm";
-import axios from "axios";
 import { useState } from "react";
 import { createTaskAction, updateTaskAction } from "@/store/task/taskActions";
 import { RootState } from "@/store";
@@ -58,8 +57,7 @@ export default function CreateTask({
 
     if (e.target.files) {
       for (const file of e.target.files) {
-        let value = URL.createObjectURL(file);
-        files.push(value);
+        files.push(file);
       }
     }
 
@@ -133,36 +131,19 @@ export default function CreateTask({
     });
   };
 
-  const uploadDocuments = async () => {
-    const data: string[] = [];
-    for (const file of state.attach) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "fabuUpload");
-      await axios
-        .post(
-          "https://api.cloudinary.com/v1_1/doi0bys97/image/upload",
-          formData
-        )
-        .then((response) => {
-          data.push(response.data["secure_url"]);
-        })
-        .catch((err) => {});
-    }
-    return data;
-  };
-
   const handleSubmit = async () => {
-    const data = {
-      title: state.title,
-      startDate: state.startDate,
-      dueDate: state.dueDate,
-      assignee: state.assignee,
-      project: state.project,
-      description: state.description,
-      priority: state.priority,
-      attach: state.attach,
-    };
+    const formData = new FormData();
+    formData.append("title", state.title);
+    formData.append("startDate", state.startDate);
+    formData.append("dueDate", state.dueDate);
+    formData.append("assignee", state.assignee);
+    formData.append("project", state.project);
+    formData.append("description", state.description);
+    formData.append("priority", state.priority);
+
+    for (let file of state.attach) {
+      formData.append("files", file);
+    }
 
     let tempErrors = {
       ...state.formErrors,
@@ -179,13 +160,7 @@ export default function CreateTask({
     setState({ ...state, formErrors: tempErrors });
     if (validateForm(state, tempErrors)) {
       dispatch(taskActions.setLoading(true));
-      // Upload documents to cloudinary OR user URL.createObjectURL(file)
-      const files = await uploadDocuments();
-
-      createTaskAction(
-        { ...data, attach: files.length > 0 ? files : data.attach },
-        token
-      )(dispatch);
+      createTaskAction(formData, token)(dispatch);
     }
   };
 
@@ -302,7 +277,7 @@ export default function CreateTask({
         <h1 className={`${state.formErrors.priority ? "text-red-500" : ""}`}>
           Priority
         </h1>
-        <div className="flex w-full justify-between">
+        <div className="flex justify-between w-full">
           <div className="flex">
             <input
               type="radio"
