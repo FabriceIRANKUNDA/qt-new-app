@@ -5,6 +5,22 @@ import { User } from '../db/models/User'
 import catchAsyncError from '../utils/helpers/catchAsyncError'
 import exceljs from 'exceljs'
 import { Types } from 'mongoose'
+import multer from 'multer'
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'files')
+  },
+  filename: (req, file, cb) => {
+    const uniquePrefix = Date.now()
+    cb(null, uniquePrefix + '-' + file.originalname)
+  },
+})
+
+export const upload = multer({
+  storage: storage,
+})
+
 export class TaskController {
   static createTask = CRUDHandler.createOne(Task)
   static updateTask = CRUDHandler.updateOne(Task)

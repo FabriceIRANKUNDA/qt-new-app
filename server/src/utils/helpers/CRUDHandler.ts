@@ -9,6 +9,11 @@ const APIfeatures = require('./APIfeatures')
 export class CRUDHandler {
   static createOne = (Model: Model<OurModels>) =>
     catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+      if (Array.isArray(req.files)) {
+        req.body.files = req.files.map((file: any) => file.filename)
+      } else {
+        req.body.files = []
+      }
       const doc = await Model.create({ ...req.body, userId: req.authorUser.id })
       return res.status(201).json({
         status: 'success',

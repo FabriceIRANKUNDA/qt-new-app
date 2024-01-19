@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { TaskController } from '../controllers/TaskController'
+import { TaskController, upload } from '../controllers/TaskController'
 import { protectedRoutes } from '../middleware/authenticated'
 
 const router = Router()
 router.use(protectedRoutes)
 router.get('/export', TaskController.exportData)
-router.route('/').get(TaskController.getAllTasks).post(TaskController.createTask)
+router.route('/').get(TaskController.getAllTasks).post(upload.array('files'), TaskController.createTask)
 router.get('/data', TaskController.getTaskData)
 
 router.get('/stats', TaskController.getTaskStats)

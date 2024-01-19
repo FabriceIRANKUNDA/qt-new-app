@@ -17,6 +17,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: false }))
 app.use(express.text({ limit: '50mb' }))
 app.use(cors({ origin: config.cors.allowedOrigin, allowedHeaders: config.cors.allowedHeaders, credentials: true }))
 app.use(express.json({ limit: '50mb', type: 'application/json' }))
+app.use('/files', express.static('files'))
 
 app.use('/api/v1', router)
 
